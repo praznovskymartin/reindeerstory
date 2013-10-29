@@ -1,0 +1,445 @@
+html, body
+{
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+}
+body
+{
+    font: 100.01% "Trebuchet MS", Trebuchet, Tahoma, Verdana, Arial, sans-serif;
+    color: #333;
+    padding: 0;
+}
+body *
+{
+    line-height:1.22em;
+}
+p
+{
+    margin: 10px 0;
+    clear: both;
+}
+
+ul, ol
+{
+    margin-left: 0;
+}
+ul ul
+{
+    margin-bottom: 20px;
+}
+table {
+    font-size: inherit;
+    border: 1px solid #c8c8c8;
+}
+
+th {
+    background: #d8d8d8;
+    text-align: left;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+td {
+    background: #f8f8f8;
+    text-align: left;
+    padding: 5px;
+    vertical-align: top;
+}
+
+select, input, textarea {
+    font: 99% "Trebuchet MS", Trebuchet, Tahoma, Verdana, Arial, sans-serif;
+}
+
+pre, code, tt, dt {
+    font: 100% monospace;
+    margin: 20px 0;
+}
+
+pre, blockquote {
+    padding: 15px;
+    background-color: #f0f0f0;
+    margin: 20px 0;
+    -moz-border-radius: 10px;
+}
+
+td pre {
+    font: 85% monospace;
+    padding: 5px;
+    margin: 5px 0;
+}
+
+div.centerStory
+{
+    margin:0px auto;
+    width:500px;
+}
+
+.hidden
+{
+   display:none; 
+}
+
+
+/* JCarousel ************************************************************/
+.jcarousel-skin-tango .jcarousel-container,
+div.nojsBox {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background: #000;
+    border: 1px solid #555;
+}
+
+.jcarousel-skin-tango .jcarousel-direction-rtl {
+    direction: rtl;
+}
+
+.jcarousel-skin-tango .jcarousel-container-horizontal {
+    width: 480px;
+    padding: 5px;
+}
+
+.jcarousel-skin-tango .jcarousel-container-vertical {
+    width: 480px;
+    height: 245px;
+    padding: 5px;
+}
+
+.jcarousel-skin-tango .jcarousel-clip {
+    overflow: hidden;
+}
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal {
+    width:  480px;
+    height: 625px;
+}
+
+.jcarousel-skin-tango .jcarousel-clip-vertical {
+    width:  480px;
+    height: 245px;
+}
+
+.jcarousel-skin-tango .jcarousel-item {
+    width: 480px;
+    height: 625px;
+}
+
+.jcarousel-skin-tango .jcarousel-item-horizontal {
+    margin-left: 0;
+    margin-right: 0px;
+}
+
+.jcarousel-skin-tango .jcarousel-direction-rtl .jcarousel-item-horizontal {
+    margin-left: 0px;
+    margin-right: 0;
+}
+
+.jcarousel-skin-tango .jcarousel-item-vertical {
+    margin-bottom: 10px;
+}
+
+.jcarousel-skin-tango .jcarousel-item-placeholder {
+    background: #fff;
+    color: #000;
+}
+
+.jcarousel-skin-tango ul li{
+    position:relative;
+    top:0px;
+    left:0px;
+}
+.jcarousel-skin-tango ul li div.content {
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:2;
+}
+.jcarousel-skin-tango ul li img {
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:1;
+}
+.jcarousel-skin-tango ul li div.content div.dialog
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:10;    
+}
+/* *** game Magnifier *** */
+.jcarousel-skin-tango ul li div.content div.magnifier
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:7;    
+}
+.jcarousel-skin-tango ul li div.content div.magnifier img
+{
+    position:absolute;
+    top:570px;
+    left:95px;
+}
+
+/* *** game MAT *** */
+.jcarousel-skin-tango ul li div.content div.gameMat
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:6;    
+}
+.jcarousel-skin-tango ul li div.content div.gameMat img.bg
+{
+    position:absolute;
+    top:505px;
+    left:127px;
+}
+.jcarousel-skin-tango ul li div.content div.gameMat div.gameMatContent
+{
+    position:relative;
+    top:505px;
+    left:127px;
+    z-index:6;
+    width: 225px;
+    height: 115px;
+}
+.jcarousel-skin-tango ul li div.content div.gameMat div.gameMatContent span
+{
+    position:absolute;
+    z-index:7;
+    display:block;
+}
+.jcarousel-skin-tango ul li div.content div.gameMat div.gameMatContent span img.matItem
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:8;
+    display:none;
+}
+.jcarousel-skin-tango ul li div#timeCongrats
+{
+    height:38px;
+    width:290px;
+    padding:15px 0 0 0;
+    text-align:left;
+    font-family: 'Salsa', serif;
+    color:#fff;
+    display:none;
+    position:absolute;
+    top:6px;
+    left:170px;
+    z-index:3;
+}
+.jcarousel-skin-tango ul li div#timeCongrats img
+{
+    display:block;
+    position:absolute;
+    left:270px;
+}
+.jcarousel-skin-tango ul li div#timeCongrats span#timeCongratBlink
+{
+    display:block;
+    position:absolute;    
+}
+
+
+
+
+/* *** hidden objects *** */
+.jcarousel-skin-tango ul li div.content div.hiddenObjects
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:5;    
+}
+.jcarousel-skin-tango ul li div.content div.hiddenObjects img
+{
+    display:block;
+    position:absolute;
+    z-index:6;
+}
+
+
+
+
+
+
+.jcarousel-skin-dialog .jcarousel-container {
+    position:absolute;
+    top:200px;
+    left:35px;
+    z-index:5;
+    background: transparent;
+    border: none;
+}
+.jcarousel-skin-dialog .jcarousel-direction-rtl {
+    direction: rtl;
+}
+.jcarousel-skin-dialog .jcarousel-container-horizontal {
+    width: 415px;
+    padding: 5px;
+}
+.jcarousel-skin-dialog .jcarousel-clip {
+    overflow: hidden;
+}
+.jcarousel-skin-dialog .jcarousel-clip-horizontal {
+    width:  415px;
+    height: 260px;
+}
+.jcarousel-skin-dialog .jcarousel-item {
+    width: 415px;
+    height: 260px;
+    color: #000;
+}
+.jcarousel-skin-dialog .jcarousel-item-horizontal {
+    margin-left: 0;
+    margin-right: 0px;
+}
+.jcarousel-skin-dialog .jcarousel-direction-rtl .jcarousel-item-horizontal {
+    margin-left: 0px;
+    margin-right: 0;
+}
+.jcarousel-skin-dialog .jcarousel-item-vertical {
+    margin-bottom: 10px;
+}
+.jcarousel-skin-dialog .jcarousel-item-placeholder {
+}
+.jcarousel-skin-dialog ul li {
+    position:relative;
+    top:0px;
+    left:0px;
+}
+.jcarousel-skin-dialog ul li div.text {
+    padding: 10px 0px 0px 10px;
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:4;
+    font-family: 'Salsa', serif;
+    font-size: 18px;
+}
+.jcarousel-skin-dialog ul li img.emotion {
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:3;
+}
+
+.jcarousel-skin-dialog ul li a {
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:5;
+}
+
+/* ControllButtons ************************************************************/
+.navBulletControllContainer {
+    position:relative;
+    top:0px;
+    left:0px;
+    width:100%;
+    margin:10px 0px;
+}
+
+.navBulletControllContainer .navBulletControllBordered {
+    display:block;
+    overflow:hidden;
+    height: 11px;
+    margin: 0px auto;
+    width:100%;
+}
+.navBulletControllContainer .navBulletControllBordered a {
+    display:block;
+    float:left;
+    margin:0px 2px;
+    height:11px;
+    background: url('../images/bullets.png') no-repeat 0px -11px transparent;
+    width:11px;
+    background-position: 0px -11px;
+}
+.navBulletControllContainer .navBulletControllBordered a.current {
+    background-position: 0px 0px;
+}
+.navBulletControllContainer .navBulletControllBordered a:hover,
+.navBulletControllContainer .navBulletControllBordered a.hover{
+    background-position: 0px 0px;
+}
+
+/* Buttons ************************************************************/
+a.greenBtn {
+    display:block;
+    overflow:hidden;
+    width:169px;
+    height:42px;
+    position:absolute;
+    top:0px;
+    left:0px;
+    color:#000;
+    float:left;
+    text-decoration:none;
+}
+a.greenBtn img
+{
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:3;
+}
+a.greenBtn span
+{
+    display:block;
+    width:169px;
+    padding:5px 0px;   
+    text-align:center;
+    position:absolute;
+    top:0px;
+    left:0px;
+    z-index:4;
+    font-family: 'Carter One', serif;
+    font-size: 24px;
+}
+a.greenBtn:hover img{
+    margin:-42px 0px 0px 0px;
+}
+
+
+/* -- TIPSY --------------------------------------------------------------- */
+.tipsy {
+    padding: 5px;
+    font-size: 16px;
+    position: absolute;
+    font-family: 'Salsa', serif;
+    z-index: 100000;
+}
+.tipsy-inner {
+    padding: 5px 8px 4px 8px;
+    background-color: black;
+    border:solid black 3px;
+    color: white;
+    max-width: 200px;
+    text-align: center;
+}
+.tipsy-inner {
+    border-radius: 3px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+}
+.tipsy-arrow {
+    position: absolute;
+    background: url('../images/tipsy.gif') no-repeat top left;
+    width: 9px;
+    height: 5px;
+}
+.tipsy-n .tipsy-arrow { top: 0; left: 50%; margin-left: -4px; }
+.tipsy-nw .tipsy-arrow { top: 0; left: 10px; }
+.tipsy-ne .tipsy-arrow { top: 0; right: 10px; }
+.tipsy-s .tipsy-arrow { bottom: 0; left: 50%; margin-left: -4px; background-position: bottom left; }
+.tipsy-sw .tipsy-arrow { bottom: 0; left: 10px; background-position: bottom left; }
+.tipsy-se .tipsy-arrow { bottom: 0; right: 10px; background-position: bottom left; }
+.tipsy-e .tipsy-arrow { top: 50%; margin-top: -4px; right: 0; width: 5px; height: 9px; background-position: top right; }
+.tipsy-w .tipsy-arrow { top: 50%; margin-top: -4px; left: 0; width: 5px; height: 9px; }

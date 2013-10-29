@@ -1,0 +1,997 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us">
+<head>
+  <title>Reindeer Story</title>
+  <meta property="og:title" content="Reindeer Story"/>
+  <meta property="og:type" content="game"/>
+  <meta property="og:url" content="http://apps.facebook.com/reindeerstory/"/>
+  <meta property="og:image" content="http://apps.facebook.com/reindeerstory/images/icon75.jpg"/>
+  <meta property="og:site_name" content="ReindeerStory"/>
+  <meta property="og:description"
+      content="Help a reindeer to fullfil his story. Find objects and beat your friends score..."/>
+  
+  <link rel="stylesheet" type="text/css" href="css/style.css?ver=1.3" />
+  <link href='http://fonts.googleapis.com/css?family=Carter+One|Salsa' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery.jcarousel.min.js"></script>
+  <script type="text/javascript" src="js/tipsy.js"></script>
+
+<script type="text/javascript">
+
+jQuery.easing.sin = function(p, n, firstNum, diff) {
+    return Math.sin(p * Math.PI / 2) * diff + firstNum;
+};
+
+jQuery.easing.cos = function(p, n, firstNum, diff) {
+    return firstNum + diff - Math.cos(p * Math.PI / 2) * diff;
+};
+/**
+ * We use the initCallback callback
+ * to assign functionality to the controls
+ */
+var myMainCorouselPointer = null;
+function mycarousel_initCallback(carousel) {
+    myMainCorouselPointer = carousel;
+    jQuery('.navBulletControllBordered a').bind('click', function() {
+        carousel.scroll(jQuery.jcarousel.intval(jQuery(this).attr('id')));
+        return false;
+    });
+
+    // Pause autoscrolling if the user moves with the cursor over the clip.
+    carousel.clip.hover(function() {
+        carousel.stopAuto();
+    }, function() {
+        carousel.startAuto();
+    });
+};
+var myDialogCorouselPointer = null;
+function myDialogCarousel_initCallback(carousel) {
+    myDialogCorouselPointer = carousel;
+};
+
+/**
+ * Dump object
+ *
+ * @param object obj - object to dump
+ * @param string name - description name
+ * @param string indent - line break
+ * @param int depth - the depth of dumping
+ * @return string movie
+ */
+var MAX_DUMP_DEPTH = 10;
+function dumpObj(obj, name, indent, depth) {
+    if (depth > MAX_DUMP_DEPTH) {
+        return indent + name + ": <Maximum Depth Reached>\n";
+    }
+    if (typeof obj == "object") {
+        var child = null;
+        var output = indent + name + "\n";
+        indent += "\t";
+        for (var item in obj)
+        {
+            try {
+                child = obj[item];
+            } catch (e) {
+                child = "<Unable to Evaluate>";
+            }
+            if (typeof child == "object") {
+                output += dumpObj(child, item, indent, depth + 1);
+           } else {
+                output += indent + item + ": " + child + "\n";
+            }
+        }
+        return output;
+    } else {
+        return obj;
+   }
+}
+   
+
+function mycarousel_animationStepCallback(properties)
+{
+    var dumped = dumpObj(properties , 'properties', '1', 7);
+    var step = 0;
+    if (properties != 0)
+    {
+      var step = Math.abs(properties/480);
+    }
+    step = step + 1;
+    jQuery('.navBulletControllBordered a.current').removeClass('current');
+    jQuery('.navBulletControllBordered a#' + step).addClass('current');
+    
+}
+
+// Ride the carousel...
+jQuery(document).ready(function() {
+    jQuery("#mycarousel").jcarousel({
+        wrap: 'last',
+        scroll: 1,
+        initCallback: mycarousel_initCallback,
+        animationStepCallback:  mycarousel_animationStepCallback,
+        buttonNextHTML: null,
+        buttonPrevHTML: null,
+    });
+});
+jQuery(document).ready(function() {
+    jQuery("#myDialogCarousel").jcarousel({
+        wrap: 'last',
+        scroll: 1,
+        initCallback: myDialogCarousel_initCallback,
+        buttonNextHTML: null,
+        buttonPrevHTML: null,
+    });
+});
+
+function carouselMainNext()
+{
+  myMainCorouselPointer.next();
+  _gaq.push(['_trackEvent', 'Carousel', 'Move', 'Next']);
+}
+function carouselMainPrev()
+{
+  myMainCorouselPointer.prev();
+  _gaq.push(['_trackEvent', 'Carousel', 'Move', 'Prev']);
+}
+
+function carouselDialogNext()
+{
+  myDialogCorouselPointer.next();
+  _gaq.push(['_trackEvent', 'CarouselDialog', 'Move', 'Next']);
+}
+function carouselDialogPrev()
+{
+  myDialogCorouselPointer.prev();
+  _gaq.push(['_trackEvent', 'CarouselDialog', 'Move', 'Prev']);
+}
+
+
+var object_desc_delimiter = '_';
+var canvas_width = 480;
+var canvas_height = 625;
+var hoAnimationInProgress = 0;
+
+var snowflakeIdName = 'lightedSnowflake';
+
+var hoItems = new Array();
+hoItems['birth'] = new Array();
+hoItems['birth']['objCount'] = 9;
+hoItems['birth']['objCountCurrent'] = 0;
+hoItems['birth']['objCountCurrentAnimated'] = 0;
+hoItems['birth']['animateObjName'] = 'baby';
+hoItems['birth']['animateObjStart'] = 5;
+hoItems['birth']['startTime'] = 0;
+hoItems['birth']['endTime'] = 0;
+hoItems['birth']['score'] = 0;
+
+// temp
+hoItems['birth']['startHintTime'] = 0;
+hoItems['birth']['displayHintAfter'] = 30;
+hoItems['birth']['allowHintTimes'] = 3;
+
+// items
+hoItems['birth']['itemsHidden'] = new Array('airplane_nose','airplane_tail','airplane_torso','airplane_wingL','airplane_wingR','horsy_feet','horsy_head','horsy_tail','horsy_torso');
+
+function grabHiddenObject(animationObject)
+{
+  _gaq.push(['_trackEvent', 'GrabObject', animationObject.id, 'Start']);
+  //var dumped = dumpObj(animationObject , 'animationObject', '1', 7);
+  //alert(animationObject.style.top);
+  
+  // get object params 
+  objectId = animationObject.id;
+  var objParams = objectId.toString().split(object_desc_delimiter.toString());
+  var objGroup  = objParams[0];
+  var objPart   = objParams[1];
+  var objState  = objParams[2];
+  
+  var hoGroup = $('#' + objectId).parent(".hiddenObjects").attr("id");
+  hoGroup = hoGroup.split('_');
+  hoGroup = hoGroup[1];
+  
+  // disable hint
+  hoItems['birth']['startHintTime']=0;
+
+  if (!$('#' + animationObject.id).attr("waited"))
+  {
+    // disable item events
+    $('#' + animationObject.id).attr('onclick','return false;');
+    // tell another item is found
+    hoItems[hoGroup]['objCountCurrent']++;
+    // remove the found obj from the item list - for hint
+    var indexItemsEl = hoItems['birth']['itemsHidden'].indexOf(objGroup + '_' + objPart);
+    if (indexItemsEl != -1)
+    {
+      //alert(indexItemsEl);
+      hoItems['birth']['itemsHidden'].splice(indexItemsEl, 1);
+    }
+    // recalculate time
+    if (hoItems[hoGroup]['objCountCurrent'] >= hoItems[hoGroup]['objCount'])
+    {
+      endTimer('birth');
+      sceneScore('birth');
+      // show time count
+    }
+  }
+  
+  // check if another animation is in progress
+  if (hoAnimationInProgress)
+  {
+    _gaq.push(['_trackEvent', 'GrabObject', animationObject.id, 'WaitStart']);
+    // wait the animation ends
+    window.setTimeout(function() {
+        grabHiddenObject(animationObject);
+    }, 200); //0,2 sec
+    if (!$('#' + animationObject.id).attr("waited"))
+    {
+      $('#' + animationObject.id).attr("waited",1);
+      $('#' + animationObject.id).animate({
+        width: animationObject.width +14,
+        height: animationObject.height +14,
+        top: parseInt($('#' + animationObject.id).css('top')) -7,
+        left: parseInt($('#' + animationObject.id).css('left')) -7,
+      }, 190);
+      //alert(parseInt($('#' + animationObject.id).css('top')));
+      // play grab sound
+      var soundGrab = jQuery("#sound_grab").get(0);
+      if(typeof(soundGrab.play) == "function") {
+        soundGrab.volume = .60;
+        soundGrab.play();
+      }
+    }
+    //$('#' + animationObject.id).fadeTo(150, 0.95);
+    return false;
+  }
+  else
+  {
+    _gaq.push(['_trackEvent', 'GrabObject', animationObject.id, 'WaitEnd']);
+    if ($('#' + animationObject.id).attr("waited"))
+    {
+      $('#' + animationObject.id).animate({
+        width: animationObject.width -14,
+        height: animationObject.height -14,
+        top: parseInt($('#' + animationObject.id).css('top')) +7,
+        left: parseInt($('#' + animationObject.id).css('left')) +7,
+      }, 5);
+    }
+    //$('#' + animationObject.id).fadeTo(10, 1);
+    hoAnimationInProgress = 1;
+  }
+  
+  // get object params  
+  var hoZindex = parseInt($('#' + objectId).css("z-index"));
+  var hoImgWidth = animationObject.width;
+  var hoImgHeight = animationObject.height;
+  
+  // show blinking snowflake
+  $('#' + snowflakeIdName)
+    .delay(900)
+    .animate({top:312},{duration:200,complete:function(){
+      var soundSpark = jQuery("#sound_spark").get(0);
+      if(typeof(soundSpark.play) == "function") {
+        soundSpark.volume = .50;
+        soundSpark.play();
+      }
+      }})
+    .css({"z-index": (hoZindex + 1)})
+    .animate({
+      top:187,
+      left:115,
+      width: 250,
+      height: 250
+    }, 700)
+    .animate({
+      top:312,
+      left:240,
+      width: 1,
+      height: 1
+      },{
+      duration: 1000,
+      complete: function() {
+          $('#lightedSnowflake').fadeOut(100).css({"z-index": (hoZindex - 1)});
+        }
+      });
+    
+  $('#' + objectId)
+    .css({"z-index": (hoZindex + 2)})
+    .animate({
+      top: [300, 'cos'],
+      left: [(canvas_width/2 - hoImgWidth*3/4), 'sin'],
+      width: (hoImgWidth*3/2),
+      height: (hoImgHeight*3/2)
+      }, {
+      duration: 1000
+    })
+    .delay(1500)
+    .animate({
+      top: '540px',
+      left: '220px',
+      width: hoImgWidth,
+      height: hoImgHeight
+      }, {
+      duration: 1000,
+      specialEasing: {
+        width: 'linear'
+      },
+      complete: function() {
+        // show on mat
+        $('#' + objGroup + '_' + objPart + '_full').fadeIn(200).css({"z-index": hoZindex});
+        
+        _gaq.push(['_trackEvent', 'GrabObject', animationObject.id, 'End']);
+        // animate cheer up
+        
+        hoItems[hoGroup]['objCountCurrentAnimated']++;
+        if (hoItems[hoGroup]['animateObjStart'] <= hoItems[hoGroup]['objCountCurrentAnimated'])
+        {
+          $('#' + hoItems[hoGroup]['animateObjName'] + '_' + (hoItems[hoGroup]['objCount'] - hoItems[hoGroup]['objCountCurrentAnimated'] +1)).fadeOut(200);
+          $('#' + hoItems[hoGroup]['animateObjName'] + '_' + (hoItems[hoGroup]['objCount'] - hoItems[hoGroup]['objCountCurrentAnimated'])).fadeIn(200);
+        }
+        
+        // tell the animation progress ended
+        hoAnimationInProgress = 0;
+       
+        if (hoItems[hoGroup]['objCountCurrentAnimated'] >= hoItems[hoGroup]['objCount'])
+        {
+          // play fanfare sound
+          var soundFanfare = jQuery("#sound_fanfare").get(0);
+          if(typeof(soundFanfare.play) == "function") {
+            soundFanfare.volume = .70;
+            soundFanfare.play();
+          }
+          // show the result
+          $('#DialogBirth')
+            .delay(1200)
+            .fadeIn(200, function() {carouselDialogNext();});
+          _gaq.push(['_trackEvent', 'Screens', 'Birth', '100%']);
+          
+          //publish('birth',hoItems['birth']['score']);
+        }
+        else
+        {
+          _gaq.push(['_trackEvent', 'Screens', 'Birth', hoItems[hoGroup]['objCountCurrentAnimated'] +
+            '/' + hoItems[hoGroup]['objCount']]);
+        }
+      }
+      });
+}
+
+function showHint()
+{
+  if (hoItems['birth']['itemsHidden'].length < 1)
+  {
+    return false;
+  }
+  var hintObj = '#' + hoItems['birth']['itemsHidden'][0] + '_hidden';
+  $(hintObj)
+  .animate({
+    width: $(hintObj).width() +14,
+    height: $(hintObj).height() +14,
+    top: parseInt($(hintObj).css('top')) -7,
+    left: parseInt($(hintObj).css('left')) -7,
+    },
+    {
+    duration: 500,
+    complete: function() {
+        $(hintObj).animate({
+          width: $(hintObj).width() -14,
+          height: $(hintObj).height() -14,
+          top: parseInt($(hintObj).css('top')) +7,
+          left: parseInt($(hintObj).css('left')) +7,
+        }, 50);
+      }
+    }
+  );
+  // play grab sound
+  var soundGrab = jQuery("#sound_grab").get(0);
+  if(typeof(soundGrab.play) == "function") {
+    soundGrab.volume = .60;
+    soundGrab.play();
+  }
+  
+  // reset the hint timer
+  hoItems['birth']['startHintTime']=0;
+  
+  //decrease hint rate
+  hoItems['birth']['allowHintTimes']--;
+  // hide hint
+  if (hoItems['birth']['allowHintTimes'] == 0)
+  {
+    $('#hint')
+    .delay(1000)
+    .animate({
+      top: '+=150',
+    }, 300);
+    // display in 2 secs
+    window.setTimeout(function() {
+        displayHint();
+    }, 7000);
+  }
+}
+
+function startHintBlink()
+{
+  hoItems['birth']['startHintTime']=0;
+  window.setTimeout(function() {
+      displayHintBlink();
+  }, 1000); // call every second
+}
+
+function displayHintBlink()
+{
+  hoItems['birth']['startHintTime']++;
+  if (hoItems['birth']['startHintTime'] >= hoItems['birth']['displayHintAfter']
+    && hoItems['birth']['allowHintTimes'] > 0)
+  {
+    blinkHint();
+  }
+  else
+  {
+    window.setTimeout(function() {
+        displayHintBlink();
+    }, 1000); // call every second
+  }
+}
+
+function displayHint()
+{
+  if (hoItems['birth']['allowHintTimes'] > 0)
+  {
+    return false;
+  }
+  $('#hint').animate({
+    left: '90px',
+    top: '570px',
+  }, 300);
+  // alow using again
+  hoItems['birth']['allowHintTimes'] = 1;
+  
+  window.setTimeout(function() {
+      displayHintBlink();
+  }, 1000); // call every second
+}
+
+function blinkHint()
+{
+  $('#hint').animate({
+    left: '+=50',
+  },
+  {
+    duration: 200,
+    complete: function() {
+      $('#hint').animate({
+        left: '-=50',
+      },
+      {
+        duration: 200,
+        complete: function() {
+          $('#hint').mouseover()
+        }
+      });
+    }
+  });
+}
+
+// timer functions
+function startTimer(sceneName)
+{
+  hoItems[sceneName]['startTime'] = new Date();
+  startHintBlink();
+}
+function endTimer(sceneName)
+{
+  hoItems[sceneName]['endTime'] = new Date();
+}
+function sceneScore(sceneName)
+{
+  var score = (hoItems[sceneName]['endTime'] - hoItems[sceneName]['startTime']) / 1000;
+  score = Math.round(score);
+  hoItems[sceneName]['score'] = score;
+  $('#'+sceneName+'TimeDialog').html(score);
+  $('#'+sceneName+'TimePanel').html(score);
+  $('#timeCongrats').fadeIn(100, function() {
+      $('#timeCongratBlink')
+      .animate({
+        top: '+=150',
+      },
+      {
+        duration: 900,
+        complete: function() {
+          $('#timeCongratBlink').animate({
+            top: '-=150',
+          },
+          {
+            duration: 900,
+            complete: function() {
+              $('#hint').animate({
+                top: '+=150',
+              },{duration:500,complete:function(){hoItems['birth']['allowHintTimes']=0;}});
+            }
+          });
+        }
+      });
+    }
+  );
+  
+
+}
+
+
+// handle loading images
+var imagesToLoadCnt = 0;
+var imagesLoadedCnt = 0;
+var unixTS = Math.round(+new Date()/1000);
+var loadingImages = new Array();
+var consoleCnt = 0;
+$(document).ready(function () {
+  
+  // bind the loading process
+  $("div#mycarousel li").find("img").each(
+    function(intIndex, el) {
+      el.src = el.src + "?t=" + unixTS;
+      $(el)
+      .load(
+        function(){
+          imageLoadedTeller(intIndex);
+        }
+      )
+      .error(
+        function(){
+          imageLoadedFailedTeller(intIndex);
+        }
+      );
+      imagesToLoadCnt++;
+      loadingImages[intIndex] = 0;
+    }
+  );
+  
+});
+
+function imageLoadedTeller(imgIndex)
+{
+  if (!loadingImages[imgIndex])
+  {
+    loadingImages[imgIndex] = 1;
+    imagesLoadedCnt++;
+  }
+  /*$('#console').html($('#console').html() + '<br />' + ++consoleCnt + '. ' +
+    imagesLoadedCnt + ' all:' + imagesToLoadCnt + ' #run:'  + imgIndex + ' @loaded:' + loadingImages[imgIndex]);*/
+  
+  showLoadingProgress();
+}
+function imageLoadedFailedTeller(imgIndex)
+{
+  
+  _gaq.push(['_trackEvent', 'Loading', 'Fail', imgIndex]);
+  //imagesLoadedCnt = imagesLoadedCnt - 1;
+  /*$('#console').html($('#console').html() + '<br />' + ++consoleCnt + '. ' +
+    imagesLoadedCnt + ' all:' + imagesToLoadCnt + ' @fail:'  + imgIndex);*/
+  //myMainCorouselPointer.scroll(1);
+  //showLoadingProgress();
+}
+
+function showLoadingProgress()
+{
+  var percent = Math.floor(imagesLoadedCnt / imagesToLoadCnt * 100);
+  $('#loadingIndicator').html('Loading... ' + percent + '%');
+  
+  /*$('#console').html($('#console').html() + '<br />' + ++consoleCnt + '. ' +
+    '@percent:' + percent);*/
+  
+  if (percent == 100)
+  {
+    window.setTimeout(function() {
+        showIntro();
+    }, 1000); //0,3 sec
+    _gaq.push(['_trackEvent', 'Loading', 'Success', '100%']);
+  }
+}
+
+function showIntro()
+{
+  //carouselMainNext();
+  myMainCorouselPointer.scroll(2);
+}
+
+$(function() {
+  $('#hint').tipsy({html: true, gravity: 'w', opacity: '0.9'});
+});
+
+</script>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-27533968-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+<body>
+  <div id="fb-root"></div>
+  <script type="text/javascript">
+  //<![CDATA[
+  window.fbAsyncInit = function() {
+      FB.init({appId: '283650914980315',
+          status: true,
+          cookie: true,
+          xfbml: true});
+  };
+  (function() {
+      var e = document.createElement('script');
+      e.async = true;
+      e.src = document.location.protocol +
+          '//connect.facebook.net/en_US/all.js';
+      document.getElementById('fb-root').appendChild(e);
+  }());
+  
+  var fburl        = 'http://apps.facebook.com/reindeerstory/';
+  var publishType  = 'share';
+  
+  function share()
+  {
+    publishType = 'share';
+    _gaq.push(['_trackEvent', 'Publisher', publishType, 'Start']);
+    var var_stream_publish = {
+      method: 'stream.publish',
+      message: '',
+      attachment: {
+        name: 'The Spirit of Christmas in a simple story.',
+        caption: '{*actor*} just read the famous Reindeer Story.',
+        title: 'Reindeer Story',
+        description: (''),
+        href: fburl+ '?ref=share',
+        media: [
+          {type: 'image',
+          src:  'http://reindeerstory.herokuapp.com/images/screenBirth/baby_1.png',
+          href: fburl+ '?ref=share'}
+        ]
+      },
+      action_links: [
+        { text: 'Read Now', href: fburl+ '?ref=share'}
+      ],
+      user_message_prompt: 'Spread the word:'
+    };
+    FB.ui(var_stream_publish, function(response) { afterPublish(response); });
+  }
+  function publish(scene,params)
+  {
+    publishType = scene;
+    _gaq.push(['_trackEvent', 'Publisher', publishType, 'Start']);
+    var var_stream_publish = {
+      method: 'stream.publish',
+      message: '',
+      attachment: {
+        name: 'Reindeer Story part 1 completed in ' + params + ' seconds!',
+        caption: '{*actor*} just cheered up a little reindeer ;) Can you do it under ' + params +' seconds?',
+        title: 'Reindeer Story',
+        description: (''),
+        href: fburl+ '?ref=share',
+        media: [
+          {type: 'image',
+          src:  'http://reindeerstory.herokuapp.com/images/screenBirth/baby_1.png',
+          href: fburl+ '?ref=share'}
+        ]
+      },
+      action_links: [
+        { text: 'Read Now', href: fburl+ '?ref=share'}
+      ],
+      user_message_prompt: 'Spread the word:'
+    };
+    FB.ui(var_stream_publish, function(response) { afterPublish(response); });
+  }
+  function afterPublish(response)
+  {
+      if (response && response.post_id) {
+          ajaxPublishStats(typePublish);
+        _gaq.push(['_trackEvent', 'Publisher', publishType, 'Success']);
+      }
+      else
+      {
+          _gaq.push(['_trackEvent', 'Publisher', publishType, 'Cancel']);
+      }
+  }
+  
+    function sendInviteRequest()
+    {
+      _gaq.push(['_trackEvent', 'Invite', 'All', 'Open']);
+      FB.ui({
+        method: 'apprequests',
+        title : 'Invite your friends play Reindeer Story',
+        message: 'Hey, bet you can\'t find all the parts of Reindeer Story ;)',
+        filters: ['app_non_users'],
+        data: '{"action":"invite","params":"0"}'
+        },
+        function(response) { afterRequest(response); }
+      );
+    }
+    
+    function afterRequest(response)
+    {
+      if (typeof response == "object") {
+        _gaq.push(['_trackEvent', 'Invite', 'All', 'Success']);
+      }
+      else
+      {
+        _gaq.push(['_trackEvent', 'Invite', 'All', 'Canceled']);
+      }
+    }
+  //]]>
+  </script>
+  
+  <noscript>
+    <div class="nojsBox"style="text-align:center; width:490px; height:50px; margin: 3px auto 3px auto; padding:10px 0; color:white;">
+      <img src="images/nojs.png" alt="Javascript not enabled" align="left" style="margin:3px" width="50" height="50" />
+      Please, enable javascript...
+    </div>
+  </noscript>
+
+
+<div class="centerStory">
+  <div id="mycarousel" class="jcarousel-skin-tango">
+    <ul>
+      <li style="background-color:white;">
+        <center>
+        <div class="content" style="position:relative;">
+          <img style="position:absolute; top:254px; left:210px; display:block;" width="57" height="57" src="images/preload_tea.gif" alt="Loading" align="center"/>
+          <span id="loadingIndicator" style="position:absolute; top:324px; left:0px; width:480px; text-align:center; display:block;">
+            Loading... 0%
+          </span>
+        </div>
+        </center>
+      </li>
+      <li>
+        <!-- Screen: Intro - begin #-->
+        <div class="content">
+          <a href="#" class="greenBtn" onclick="carouselMainNext(); return false;"
+            style="left:145px; top:405px;">
+            <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+            <span>Read</span>
+          </a>
+        </div>
+        <img width="480" height="625" src="images/screenIntro.jpg" alt="" />
+        <!-- Screen: Intro - end #-->
+      </li>
+      <li>
+        <!-- Screen: Birth - begin #-->
+        <div class="content">
+          <div id="DialogBirth" class="dialog">
+            <img width="480" height="625" src="images/dialogBox.png" alt="" />
+            <div id="myDialogCarousel" class="jcarousel-skin-dialog">
+              <ul>
+                <li>
+                  <div class="text">
+                    <br />
+                    Once Upon a Time,<br />
+                    <br />
+                    &nbsp;a Reindeer was Born.<br />
+                    &nbsp;&nbsp;His Name was Rudolph. <br />
+                    &nbsp;&nbsp;&nbsp;He was different than other Reindeers, <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;he had a glowing Red Nose. <br />
+                  </div>
+                  <a href="#" class="greenBtn" onclick="carouselDialogNext(); return false;"
+                    style="left:231px; top:193px;">
+                    <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+                    <span>Next</span>
+                  </a>
+                </li>
+                <li>
+                  <img src="images/hourglass_medium.png" width="84" height="89" alt="" class="emotion"
+                    style="top:85px; left:300px;"/>
+                  <div class="text">
+                    <br />
+                    Rudolf dreamt of <br />
+                    &nbsp;Flying and wanted to <br />
+                    &nbsp;&nbsp;become a part Horse team.<br />
+                    <br />
+                    &nbsp;&nbsp;&nbsp;Find the parts of a Horse and a <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;Airplane to Cheer Up Rudolf...<br />
+                  </div>
+                  <!--
+                  <a href="#" class="greenBtn" onclick="carouselDialogPrev(); return false;"
+                    style="left:10px; top:193px;">
+                    <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+                    <span>Previous</span>
+                  </a>
+                  #-->
+                  <a href="#" class="greenBtn" onclick="$('#DialogBirth').fadeOut(200); startTimer('birth'); return false;"
+                    style="left:231px; top:193px;">
+                    <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+                    <span>Search</span>
+                  </a>
+                </li>
+                <li>
+                  <img src="images/pulmUpSanta.png" width="182" height="166" alt="" class="emotion"
+                    style="top:45px; left:220px;"/>
+                  <div class="text">
+                    <br />
+                    CONGRATULATIONS!
+                    <br /><br />
+                    &nbsp;you found Rudolf toys<br />
+                    &nbsp;&nbsp;in only <span id="birthTimeDialog"></span> seconds<br />
+                    &nbsp;&nbsp;&nbsp;go right ahead...<br />
+                  </div>
+                  <a href="#" class="greenBtn" onclick="publish('birth',hoItems['birth']['score']); return false;"
+                    style="left:10px; top:193px;">
+                    <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+                    <span>Publish</span>
+                  </a>
+                  <a href="#" class="greenBtn" onclick="carouselMainNext(); return false;"
+                    style="left:231px; top:193px;">
+                    <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+                    <span>Next</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div id="timeCongrats">
+            <span id="timeCongratBlink">Awesome...</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            finished in <span id="birthTimePanel">999</span> seconds
+            <img src="images/hourglass_small.png" width="36" height="38" alt="" />
+          </div>
+          
+          <a href="#" onclick="showHint(); return false;" id="hint" title="Click here for a Hint!" style="width:59px; height:58px; display:block; position:absolute; top:570px; left:90px; z-index:7;">
+            <img src="images/magnifier.png" width="59" height="58" alt="Hint" />
+          </a>
+          
+          <div id="gameMat" class="gameMat">
+            <img src="images/gameMat.png" width="225" height="115" alt="" class="bg" />
+            <div class="gameMatContent">
+              <span style="top:40px; left:27px;">
+                <img src="images/screenBirth/airplane_alfa40.png" width="82" height="43" alt="" />
+                
+                <img id="airplane_nose_full" src="images/screenBirth/airplane_nose_full.png" width="82" height="43" alt="" class="matItem"/>
+                <img id="airplane_tail_full" src="images/screenBirth/airplane_tail_full.png" width="82" height="43" alt="" class="matItem"/>
+                <img id="airplane_torso_full" src="images/screenBirth/airplane_torso_full.png" width="82" height="43" alt="" class="matItem"/>
+                <img id="airplane_wingL_full" src="images/screenBirth/airplane_wingL_full.png" width="82" height="43" alt="" class="matItem"/>
+                <img id="airplane_wingR_full" src="images/screenBirth/airplane_wingR_full.png" width="82" height="43" alt="" class="matItem"/>
+                <img id="airplane_normal" src="images/screenBirth/airplane_normal.png" width="82" height="43" alt="" class="matItem"/>
+              </span>
+              <span style="top:25px; left:130px;">
+                <img src="images/screenBirth/horsy_alfa40.png" width="69" height="68" alt="" />
+                
+                <img id="horsy_feet_full" src="images/screenBirth/horsy_feet_full.png" width="69" height="68" alt="" class="matItem"/>
+                <img id="horsy_head_full" src="images/screenBirth/horsy_head_full.png" width="69" height="68" alt="" class="matItem"/>
+                <img id="horsy_tail_full" src="images/screenBirth/horsy_tail_full.png" width="69" height="68" alt="" class="matItem"/>
+                <img id="horsy_torso_full" src="images/screenBirth/horsy_torso_full.png" width="69" height="68" alt="" class="matItem"/>
+                <img id="horsy_normal" src="images/screenBirth/horsy_normal.png" width="69" height="68" alt="" class="matItem"/>
+              </span>
+              
+            </div>
+          </div>
+          
+          <div id="hiddenObjects_birth" class="hiddenObjects">
+            <img id="airplane_nose_hidden" style="top:169px; left:421px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/airplane_nose_hidden.png"
+              width="17" height="18" alt="" />
+            <img id="airplane_tail_hidden" style="top:189px; left:163px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/airplane_tail_hidden.png"
+              width="24" height="26" alt="" />
+            <img id="airplane_torso_hidden" style="top:385px; left:145px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/airplane_torso_hidden.png"
+              width="41" height="25" alt="" />
+            <img id="airplane_wingL_hidden" style="top:195px; left:59px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/airplane_wingL_hidden.png"
+              width="16" height="14" alt="" />
+            <img id="airplane_wingR_hidden" style="top:416px; left:415px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/airplane_wingR_hidden.png"
+              width="23" height="41" alt="" />
+            
+            <img id="horsy_feet_hidden" style="top:213px; left:27px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/horsy_feet_hidden.png"
+              width="74" height="26" alt="" />
+            <img id="horsy_head_hidden" style="top:293px; left:89px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/horsy_head_hidden.png"
+              width="32" height="31" alt="" />
+            <img id="horsy_tail_hidden" style="top:232px; left:447px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/horsy_tail_hidden.png"
+              width="30" height="33" alt="" />
+            <img id="horsy_torso_hidden" style="top:281px; left:265px;"
+              onclick="grabHiddenObject(this);" src="images/screenBirth/horsy_torso_hidden.png"
+              width="46" height="49" alt="" />
+            
+            <img id="lightedSnowflake" style="top:305px; left:240px;"
+              src="images/snowflakeBg_v2.png" width="1" height="1" alt="" />
+            
+            <img id="baby_1" style="top:266px; left:313px; display:none;"
+              src="images/screenBirth/baby_1.png" width="52" height="52" alt="" />
+            <img id="baby_2" style="top:266px; left:313px; display:none;"
+              src="images/screenBirth/baby_2.png" width="52" height="52" alt="" />
+            <img id="baby_3" style="top:266px; left:313px; display:none;"
+              src="images/screenBirth/baby_3.png" width="52" height="52" alt="" />
+            <img id="baby_4" style="top:266px; left:313px; display:none;"
+              src="images/screenBirth/baby_4.png" width="52" height="52" alt="" />
+            <img id="baby_5" style="top:266px; left:313px;"
+              src="images/screenBirth/baby_5.png" width="52" height="52" alt="" />
+          </div>
+          
+        </div>
+        
+        <img width="480" height="625" src="images/screenBirth.jpg" alt="" />
+        <!-- Screen: Birth - end #-->
+      </li>
+      <li>
+        <!-- Screen: Work - begin #-->
+        <div class="content">
+          <div style="position:absolute;top:100px; width: 480px; left:0px; color:white; font-family: 'Salsa', serif; font-size:22px; text-align:center;">
+            To be continued...
+            <br /><br /><br /><br /><br /><br /><br />
+            <span style="color:#eee;">You'll hear soon enough from the little Rednose Reindeer ;)</span>
+          </div>
+          <a href="#" class="greenBtn" onclick="carouselMainNext(); return false;"
+            style="left:155px; top:405px;">
+            <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+            <span>Next</span>
+          </a>
+        </div>
+        <img width="480" height="625" src="images/screenWork.jpg" alt="" />
+        <!-- Screen: Work - end #-->
+      </li>
+      <li>
+        <!-- Screen: Outro - begin #-->
+        <div class="content">
+          <div style="z-index:100; position:absolute; top:230px; left:200px;">
+            <fb:like
+              layout="button_count"
+              href="http%3A%2F%2Fwww.facebook.com%2Fapps%2Fapplication.php%3Fid%3D283650914980315"></fb:like>
+          </div>
+          
+          <a href="#" class="greenBtn" onclick="sendInviteRequest(); return false;"
+            style="left:10px; top:270px;">
+            <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+            <span>Invite</span>
+          </a>
+          
+          <a href="#" class="greenBtn" onclick="share(); return false;"
+            style="left:301px; top:270px;">
+            <img src="images/btnGreenBg.png" width="169" height="84" alt="" />
+            <span>Share</span>
+          </a>
+        </div>
+        <img width="480" height="625" src="images/screenOutro.jpg" alt="" />
+        <!-- Screen: Outro - end #-->
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!--
+<div class="centerStory">
+  <div class="navBulletControllContainer">
+      <div class="navBulletControllBordered">
+          <a class="current" href="#" id="1"></a>
+          <a class="" href="#" id="2"></a>
+          <a class="" href="#" id="3"></a>
+          <a class="" href="#" id="4"></a>
+          <a class="" href="#" id="5"></a>
+      </div>
+  </div>
+</div>
+#-->
+
+<audio preload="auto" id="sound_grab">
+  <source src="sounds/grab.ogg" type="audio/ogg"></source>
+  <source src="sounds/grab.mp3" type="audio/mp3"></source>  
+</audio>
+<audio preload="auto" id="sound_spark">
+  <source src="sounds/spark.ogg" type="audio/ogg"></source>
+  <source src="sounds/spark.mp3" type="audio/mp3"></source>
+</audio>
+<audio preload="auto" id="sound_fanfare">
+  <source src="sounds/fanfare.ogg" type="audio/ogg"></source>
+  <source src="sounds/fanfare.mp3" type="audio/mp3"></source>
+</audio>
+
+<div id="console">
+</div>
+
+</body>
+</html>
