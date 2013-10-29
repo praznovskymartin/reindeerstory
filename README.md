@@ -1,8 +1,9 @@
 REINDEER STORY
 --------------
 
+A Christmas hidden object game.
+jQuery demo for the purpose of animation tests.
 
-Reindeer Story is a jQuery demo for the purpose of animation tests.
+Martin Praznovsky
 
-Martin Práznovský
 Copyright 2011-2013
