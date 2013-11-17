@@ -2,7 +2,7 @@ REINDEER STORY
 --------------
 
 A Christmas hidden object game.
-jQuery demo for the purpose of animation tests & git testing and so on and on 4x... ;)
+jQuery demo for the purpose of animation tests & git testing and so on and on 5x... ;)
 
 Martin Praznovsky
 
